@@ -15,36 +15,45 @@ class Quiz extends StatefulWidget {
 
 class _QuizState extends State<Quiz> {
   List<String> _selectedAnswers = []; //var selectedAnswers = [];
-  var activeScreen = 'start-screen';
+  var _activeScreen = 'start-screen';
 
   void switchScreen() {
     setState(() {
-      activeScreen = 'questions-screen';
+      _activeScreen = 'questions-screen';
     });
   }
 
-  void chooseAnswer(String answer) {
+  void _chooseAnswer(String answer) {
     _selectedAnswers.add(answer);
 
     if (_selectedAnswers.length == questions.length) {
       setState(() {
-        activeScreen = 'results-screen';
+        _activeScreen = 'results-screen';
       });
     }
   }
+
+  void restartQuiz() {
+    setState(() {
+      _selectedAnswers = [];
+      _activeScreen = 'questions-screen';
+    });
+  }
+
 
   @override
   Widget build(context) {
     Widget screenWidget = StartScreen(switchScreen);
 
-    if (activeScreen == 'questions-screen') {
-      return QuestionsScreen(
-        onSelectAnswer: chooseAnswer,
+    if (_activeScreen == 'questions-screen') {
+      screenWidget = QuestionsScreen(
+        onSelectAnswer: _chooseAnswer,
       );
     }
 
-    if (activeScreen == 'results-screen') {
-      return ResultsScreen(chosenAnswers: _selectedAnswers);
+    if (_activeScreen == 'results-screen') {
+      screenWidget = ResultsScreen(
+          chosenAnswers: _selectedAnswers, onRestart: restartQuiz);
     }
 
     return MaterialApp(
@@ -60,9 +69,9 @@ class _QuizState extends State<Quiz> {
               end: Alignment.bottomRight,
             ),
           ),
-          child: activeScreen == 'start-screen'
+          child: _activeScreen == 'start-screen'
               ? StartScreen(switchScreen)
-              : QuestionsScreen(onSelectAnswer: chooseAnswer),
+              : QuestionsScreen(onSelectAnswer: _chooseAnswer),
         ),
       ),
     );
